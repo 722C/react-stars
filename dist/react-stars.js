@@ -34,7 +34,8 @@ var defaultStyles = {
   overflow: 'hidden',
   cursor: 'pointer',
   display: 'block',
-  float: 'left'
+  float: 'left',
+  fontFamily: 'FontAwesome'
 };
 
 var getHalfStarStyles = function getHalfStarStyles(color, uniqueness) {
@@ -67,6 +68,7 @@ var ReactStars = function (_Component) {
       count: props.count,
       size: props.size,
       char: props.char,
+      emptyChar: props.emptyChar,
       // default color of inactive star
       color1: props.color1,
       // color of an active star
@@ -74,7 +76,6 @@ var ReactStars = function (_Component) {
       half: props.half,
       edit: props.edit
     };
-
     return _this;
   }
 
@@ -94,7 +95,17 @@ var ReactStars = function (_Component) {
         halfStar: {
           at: Math.floor(props.value),
           hidden: this.state.config.half && props.value % 1 < 0.5
-        }
+        },
+        config: _extends({}, this.state.config, {
+          count: props.count,
+          size: props.size,
+          char: props.char,
+          emptyChar: props.emptyChar,
+          color1: props.color1,
+          color2: props.color2,
+          half: props.half,
+          edit: props.edit
+        })
       });
     }
   }, {
@@ -188,7 +199,7 @@ var ReactStars = function (_Component) {
         var isAtHalf = this.moreThanHalf(event, config.size);
         halfStar.hidden = isAtHalf;
         if (isAtHalf) index = index + 1;
-        value = isAtHalf ? index : index + .5;
+        value = isAtHalf ? index : index + 0.5;
         halfStar.at = index;
       } else {
         value = index = index + 1;
@@ -206,9 +217,11 @@ var ReactStars = function (_Component) {
           config = _state4.config,
           uniqueness = _state4.uniqueness;
 
-      return _react2.default.createElement('style', { dangerouslySetInnerHTML: {
+      return _react2.default.createElement('style', {
+        dangerouslySetInnerHTML: {
           __html: getHalfStarStyles(config.color2, uniqueness)
-        } });
+        }
+      });
     }
   }, {
     key: 'renderStars',
@@ -225,7 +238,8 @@ var ReactStars = function (_Component) {
           size = config.size,
           char = config.char,
           half = config.half,
-          edit = config.edit;
+          edit = config.edit,
+          emptyChar = config.emptyChar;
 
       return stars.map(function (star, i) {
         var starClass = '';
@@ -237,20 +251,18 @@ var ReactStars = function (_Component) {
           cursor: edit ? 'pointer' : 'default',
           fontSize: size + 'px'
         });
-        return _react2.default.createElement(
-          'span',
-          {
-            className: starClass,
-            style: style,
-            key: i,
-            'data-index': i,
-            'data-forhalf': char,
-            onMouseOver: _this2.mouseOver.bind(_this2),
-            onMouseMove: _this2.mouseOver.bind(_this2),
-            onMouseLeave: _this2.mouseLeave.bind(_this2),
-            onClick: _this2.clicked.bind(_this2) },
-          char
-        );
+        return _react2.default.createElement('span', {
+          className: starClass,
+          style: style,
+          key: i,
+          'data-index': i,
+          'data-forhalf': config.char,
+          onMouseOver: _this2.mouseOver.bind(_this2),
+          onMouseMove: _this2.mouseOver.bind(_this2),
+          onMouseLeave: _this2.mouseLeave.bind(_this2),
+          onClick: _this2.clicked.bind(_this2),
+          dangerouslySetInnerHTML: { __html: star.active ? char : emptyChar }
+        });
       });
     }
   }, {
@@ -278,6 +290,7 @@ ReactStars.propTypes = {
   value: _propTypes2.default.number,
   count: _propTypes2.default.number,
   char: _propTypes2.default.string,
+  emptyChar: _propTypes2.default.string,
   size: _propTypes2.default.number,
   color1: _propTypes2.default.string,
   color2: _propTypes2.default.string
@@ -288,7 +301,9 @@ ReactStars.defaultProps = {
   half: true,
   value: 0,
   count: 5,
-  char: '★',
+  // These are font-awesome characters
+  char: '',
+  emptyChar: '',
   size: 15,
   color1: 'gray',
   color2: '#ffd700',
